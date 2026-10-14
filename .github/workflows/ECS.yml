@@ -1,0 +1,10 @@
+name: Deploy to ECS Instance in AWS
+
+on:
+  workflow_call:
+
+jobs:
+
+  ECS:
+    runs-on: ubuntu-latest
+    steps:
