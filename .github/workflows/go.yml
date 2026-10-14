@@ -55,18 +55,18 @@ jobs:
     # A file, directory or wildcard pattern that describes what to upload
         path: main
 
-  Deploy_EC2:
-    needs: build
-    uses: ./.github/workflows/Deploy_EC2.yml
-    secrets: inherit
+  # Deploy_EC2:
+  #   needs: build
+  #   uses: ./.github/workflows/Deploy_EC2.yml
+  #   secrets: inherit
 
   docker:
     needs: build
     uses: ./.github/workflows/Docker.yml
     secrets: inherit
 
-  # Deploy_ECS:
-  #   needs: [build, docker]
-  #   uses: ./.github/workflows/ECS.yml
-  #   secrets: inherit
+  Deploy_ECS:
+    needs: [build, docker]
+    uses: ./.github/workflows/ECS.yml
+    secrets: inherit
 
