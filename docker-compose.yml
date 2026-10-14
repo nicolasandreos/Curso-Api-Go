@@ -16,6 +16,23 @@ services:
       timeout: 5s
       retries: 10
 
+  app:
+    build: .
+    image: curso-ci-3:local
+    ports:
+      - "8083:8083"
+    environment:
+      - PORT=8083
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=root
+      - DATABASE_NAME=root
+      - DATABASE_SSLMODE=disable
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   pgadmin-compose:
     image: dpage/pgadmin4
     environment:

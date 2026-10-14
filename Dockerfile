@@ -1,13 +1,31 @@
-FROM ubuntu:latest
+FROM golang:1.22-alpine AS build
 
-EXPOSE 8000
+WORKDIR /src
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+RUN CGO_ENABLED=0 go build -o main .
+
+FROM alpine:3.20
 
 WORKDIR /app
 
-ENV DATABASE_HOST=localhost DATABASE_PORT=5432
+RUN apk add --no-cache ca-certificates
 
-ENV DATABASE_USER=root DATABASE_PASSWORD=root DATABASE_NAME=root
+COPY --from=build /src/main .
+COPY templates ./templates
+COPY assets ./assets
 
-COPY ./main main
+ENV PORT=8083
+ENV DATABASE_HOST=postgres
+ENV DATABASE_PORT=5432
+ENV DATABASE_USER=root
+ENV DATABASE_PASSWORD=root
+ENV DATABASE_NAME=root
+ENV DATABASE_SSLMODE=disable
 
-CMD [ "./main" ]
+EXPOSE 8083
+
+CMD ["./main"]
