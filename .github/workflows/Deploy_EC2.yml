@@ -44,11 +44,11 @@ jobs:
               exit 1
             fi
             pkill -x main || true
-            export DATABASE_HOST=${{ secrets.DATABASE_HOST }}
-            export DATABASE_USER=${{ secrets.DATABASE_USER }}
-            export DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
-            export DATABASE_NAME=${{ secrets.DATABASE_NAME }}
-            export DATABASE_PORT=${{ secrets.DATABASE_PORT }}
+            export DATABASE_HOST='${{ secrets.DATABASE_HOST }}'
+            export DATABASE_USER='${{ secrets.DATABASE_USER }}'
+            export DATABASE_PASSWORD='${{ secrets.DATABASE_PASSWORD }}'
+            export DATABASE_NAME='${{ secrets.DATABASE_NAME }}'
+            export DATABASE_PORT='${{ secrets.DATABASE_PORT }}'
             export DATABASE_SSLMODE=require
             export PORT=8083
             chmod +x main
