@@ -6,25 +6,27 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
-RUN CGO_ENABLED=0 go build -o main .
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o /out/main .
 
 FROM alpine:3.20
 
+RUN apk add --no-cache ca-certificates \
+    && adduser -D -H -u 10001 appuser
+
 WORKDIR /app
 
-RUN apk add --no-cache ca-certificates
+COPY --from=build /out/main /app/main
+COPY --from=build /src/templates /app/templates
+COPY --from=build /src/assets /app/assets
 
-COPY --from=build /src/main .
-COPY templates ./templates
-COPY assets ./assets
+RUN chmod 755 /app/main \
+    && chown -R appuser:appuser /app
+
+USER appuser
 
 ENV PORT=8083
-ENV DATABASE_HOST=postgres
-ENV DATABASE_PORT=5432
-ENV DATABASE_USER=root
-ENV DATABASE_PASSWORD=root
-ENV DATABASE_NAME=root
-ENV DATABASE_SSLMODE=disable
+ENV GIN_MODE=release
+ENV DATABASE_SSLMODE=require
 
 EXPOSE 8083
 

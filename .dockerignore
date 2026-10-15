@@ -1,0 +1,9 @@
+.git
+.github
+.env
+.env.*
+*.md
+docker-compose.yml
+postgres-data
+main
+main.exe
