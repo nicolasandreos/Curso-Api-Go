@@ -31,6 +31,9 @@ jobs:
             .registeredBy,
             .deregisteredAt
           )' > task-definition.json
+
+    - name: Copy task definition
+      run: cp task-definition.json task-definition.json.old
    
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
@@ -52,6 +55,19 @@ jobs:
       uses: aws-actions/amazon-ecs-deploy-task-definition@v2
       with:
         task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: Servico-Api-Go
+        cluster: Cluster-Api-Go
+        wait-for-service-stability: true 
+
+    - name: Check new Deploy is running
+      continue-on-error: true
+      run: echo "REQUEST=0" >> $GITHUB_ENV ; sleep 30s ; wget http://lb-api-go-1585625050.us-east-2.elb.amazonaws.com:8083/nicolas || echo "REQUEST=1" >> $GITHUB_ENV
+        
+    - name: Rollback Deploy Amazon ECS task definition
+      if: ${{ env.REQUEST == '1' }}
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+      with:
+        task-definition: task-definition.json.old
         service: Servico-Api-Go
         cluster: Cluster-Api-Go
         wait-for-service-stability: true 
