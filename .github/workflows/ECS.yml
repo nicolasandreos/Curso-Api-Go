@@ -26,5 +26,22 @@ jobs:
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
         task-definition: task-definition.json
-        container-name: Go
+        container-name: Main
         image: ${{ secrets.DOCKERHUB_USERNAME }}/curso-ci-3:${{ github.sha }}
+        environment-variables: |
+          DATABASE_HOST='${{ secrets.DATABASE_HOST }}'
+          DATABASE_USER='${{ secrets.DATABASE_USER }}'
+          DATABASE_PASSWORD='${{ secrets.DATABASE_PASSWORD }}'
+          DATABASE_NAME='${{ secrets.DATABASE_NAME }}'
+          DATABASE_PORT='${{ secrets.DATABASE_PORT }}'
+          DATABASE_SSLMODE=require
+          PORT=8083
+          
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: Servico-Api-Go
+        cluster: Cluster-Api-Go
+        wait-for-service-stability: true
+        region: us-east-2
