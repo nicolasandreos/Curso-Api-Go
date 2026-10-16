@@ -25,14 +25,14 @@ jobs:
     - name: Create locustfile
       run: |
         cat > locustfile.py << 'EOF'
-        from locust import HttpUser, TaskSet, task, between, constant, constant_throughput
+        from locust import FastHttpUser, TaskSet, task, constant_throughput
 
         class UserTasks(TaskSet):
             @task(1)
             def index(self):
                 self.client.get("/nicolas")
 
-        class WebsiteUser(HttpUser):
+        class WebsiteUser(FastHttpUser):
             tasks = [UserTasks]
             wait_time = constant_throughput(1)
         EOF
@@ -50,4 +50,4 @@ jobs:
           fi
           sleep 10
         done
-        locust -f locustfile.py --headless -u 5000 -r 200 --run-time 60s -H "$APP_URL"
+        locust -f locustfile.py --headless --processes -1 -u 5000 -r 100 --run-time 300s -H "$APP_URL"
