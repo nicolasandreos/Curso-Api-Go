@@ -25,7 +25,7 @@ jobs:
     - name: Create locustfile
       run: |
         cat > locustfile.py << 'EOF'
-        from locust import HttpUser, TaskSet, task, between, constant
+        from locust import HttpUser, TaskSet, task, between, constant, constant_throughput
 
         class UserTasks(TaskSet):
             @task(1)
@@ -34,7 +34,7 @@ jobs:
 
         class WebsiteUser(HttpUser):
             tasks = [UserTasks]
-            wait_time = constant(1)
+            wait_time = constant_throughput(1)
         EOF
 
     - name: Run Load Test
@@ -50,4 +50,4 @@ jobs:
           fi
           sleep 10
         done
-        locust -f locustfile.py --headless -u 3000 -r 200 --run-time 60s -H "$APP_URL"
+        locust -f locustfile.py --headless -u 5000 -r 200 --run-time 60s -H "$APP_URL"
